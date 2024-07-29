@@ -5,6 +5,7 @@ import 'package:oauth_webauth/oauth_webauth.dart';
 import 'package:oauth_webauth/src/utils/custom_pop_scope.dart';
 
 class OAuthWebScreen extends StatelessWidget {
+  static OAuthWebScreen? oAuthWebScreen;
   static Future? start({
     Key? key,
     GlobalKey<OAuthWebViewState>? globalKey,
@@ -26,14 +27,15 @@ class OAuthWebScreen extends StatelessWidget {
       oauthFlow.onNavigateTo(OAuthWebAuth.instance.appBaseUrl);
       return null;
     }
+    oAuthWebScreen = OAuthWebScreen(
+      key: key,
+      globalKey: globalKey,
+      configuration: configuration,
+    );
     return Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => OAuthWebScreen(
-                  key: key,
-                  globalKey: globalKey,
-                  configuration: configuration,
-                )));
+            builder: (context) => oAuthWebScreen!));
   }
 
   late final BuildContext context;
