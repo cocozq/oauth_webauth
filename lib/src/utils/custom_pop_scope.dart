@@ -16,13 +16,15 @@ class CustomPopScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var popped = false;
     return PopScope(
       canPop: false,
       onPopInvoked: onPopInvoked ??
           (didPop) {
             if (didPop) return;
             canGoBack?.call().then((canPop) {
-              if (canPop) {
+              if (canPop && !popped) {
+                popped = true;
                 Navigator.of(context).pop();
               }
             });
