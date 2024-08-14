@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 typedef CanGoBackCallback = Future<bool> Function();
 
 class CustomPopScope extends StatelessWidget {
-  const CustomPopScope({
+  CustomPopScope({
     required this.child,
     this.onPopInvoked,
     this.canGoBack,
@@ -13,10 +13,11 @@ class CustomPopScope extends StatelessWidget {
   final Widget child;
   final PopInvokedCallback? onPopInvoked;
   final CanGoBackCallback? canGoBack;
+  static bool popped = false;
 
   @override
   Widget build(BuildContext context) {
-    var popped = false;
+    popped = false;
     return PopScope(
       canPop: false,
       onPopInvoked: onPopInvoked ??
