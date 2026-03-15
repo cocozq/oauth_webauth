@@ -138,6 +138,10 @@ class BaseWebViewState<S extends BaseWebView> extends State<S>
         },
         shouldOverrideUrlLoading: (controller, navigationAction) async {
           final url = navigationAction.request.url?.toString() ?? '';
+          if (startsWithAnyRedirectUrl(url)) {
+            onSuccess(url);
+            return NavigationActionPolicy.CANCEL;
+          }
           return onNavigateTo(url)
               ? NavigationActionPolicy.ALLOW
               : NavigationActionPolicy.CANCEL;
@@ -153,6 +157,10 @@ class BaseWebViewState<S extends BaseWebView> extends State<S>
           showLoading();
         },
         onLoadStop: (controller, url) async {
+          final urlString = url?.toString() ?? '';
+          if (urlString.isNotEmpty && !startsWithAnyRedirectUrl(urlString)) {
+            onNavigateTo(urlString);
+          }
           hideLoading();
         },
         onReceivedError: (controller, request, error) => hideLoading(),

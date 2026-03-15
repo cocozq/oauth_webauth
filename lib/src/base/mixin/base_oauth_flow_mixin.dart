@@ -67,7 +67,7 @@ mixin BaseOAuthFlowMixin on BaseFlowMixin {
       if (ignoreStartIndex > -1) {
         responseRedirect = responseRedirect.substring(0, ignoreStartIndex);
       }
-      final parameters = Uri.dataFromString(responseRedirect).queryParameters;
+      final parameters = Uri.parse(responseRedirect).queryParameters;
 
       if (parameters.isEmpty &&
           (baseUrl?.isNotEmpty ?? false) &&
