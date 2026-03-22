@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart';
@@ -27,6 +28,47 @@ class OAuthWebScreen extends StatelessWidget {
       oauthFlow.onNavigateTo(OAuthWebAuth.instance.appBaseUrl);
       return null;
     }
+    
+    if (configuration.enablePKCE == false) {
+      final completer = Completer<String?>();
+      final configWithRedirect = configuration.copyWith(
+        onSuccessRedirect: (url) {
+          debugPrint("# OAuthWebScreen -> onSuccessRedirect: $url");
+          if (!completer.isCompleted) {
+            completer.complete(url);
+            Navigator.of(context).pop();
+          }
+        },
+        onError: (error) {
+          debugPrint("# OAuthWebScreen -> onError: $error");
+          if (!completer.isCompleted) {
+            completer.complete(null);
+            Navigator.of(context).pop();
+          }
+        },
+        onCancel: () {
+          debugPrint("# OAuthWebScreen -> onCancel");
+          if (!completer.isCompleted) {
+            completer.complete(null);
+            Navigator.of(context).pop();
+          }
+        },
+      );
+      
+      oAuthWebScreen = OAuthWebScreen(
+        key: key,
+        globalKey: globalKey,
+        configuration: configWithRedirect,
+      );
+      
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => oAuthWebScreen!));
+      
+      return completer.future;
+    }
+    
     oAuthWebScreen = OAuthWebScreen(
       key: key,
       globalKey: globalKey,
@@ -66,6 +108,7 @@ class OAuthWebScreen extends StatelessWidget {
                   onSuccessAuth: _onSuccess,
                   onError: _onError,
                   onCancel: _onCancel,
+                  onSuccessRedirect: configuration.onSuccessRedirect,
                 ),
               ),
             ),
@@ -76,8 +119,14 @@ class OAuthWebScreen extends StatelessWidget {
   }
 
   void _onSuccess(Credentials credentials) {
-    Navigator.pop(context, credentials);
+    if (configuration.enablePKCE ?? true) {
+      Navigator.pop(context, credentials);
+    }
     configuration.onSuccessAuth?.call(credentials);
+  }
+
+  void _onSuccessRedirect(String redirectUrl) {
+    configuration.onSuccessRedirect?.call(redirectUrl);
   }
 
   void _onError(dynamic error) {

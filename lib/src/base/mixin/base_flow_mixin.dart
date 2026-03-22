@@ -15,6 +15,7 @@ mixin BaseFlowMixin {
 
   Uri initialUri = Uri();
   final Set<String> redirectUrls = {};
+  bool _successCalled = false;
 
   void init({
     Uri? initialUri,
@@ -32,6 +33,8 @@ mixin BaseFlowMixin {
     _onSuccessRedirect = onSuccessRedirect;
     _onError = onError;
     _onCancel = onCancel;
+    _successCalled = false;
+    debugPrint("# BaseFlowMixin -> init: _onSuccessRedirect = $_onSuccessRedirect");
   }
 
   void showLoading() {}
@@ -55,8 +58,15 @@ mixin BaseFlowMixin {
   }
 
   void onSuccess(String responseRedirect) async {
+    if (_successCalled) {
+      debugPrint("# BaseFlowMixin -> onSuccess already called, ignoring duplicate");
+      return;
+    }
+    _successCalled = true;
+    debugPrint("# BaseFlowMixin -> onSuccess: calling _onSuccessRedirect with $responseRedirect");
     clearState();
     _onSuccessRedirect?.call(responseRedirect);
+    debugPrint("# BaseFlowMixin -> onSuccess: _onSuccessRedirect callback completed");
   }
 
   void onError(dynamic error) {

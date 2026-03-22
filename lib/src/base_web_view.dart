@@ -158,7 +158,7 @@ class BaseWebViewState<S extends BaseWebView> extends State<S>
         },
         onLoadStop: (controller, url) async {
           final urlString = url?.toString() ?? '';
-          if (urlString.isNotEmpty && !startsWithAnyRedirectUrl(urlString)) {
+          if (urlString.isNotEmpty && urlString != initialUri.toString() && !startsWithAnyRedirectUrl(urlString)) {
             onNavigateTo(urlString);
           }
           hideLoading();
